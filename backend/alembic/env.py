@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 db_url = os.getenv('DATABASE_URL')
-print(f"DEBUG: Attempting to connect with URL: {db_url}") 
 config.set_main_option('sqlalchemy.url', db_url)
 
 # Interpret the config file for Python logging.
