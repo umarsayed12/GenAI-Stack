@@ -9,7 +9,7 @@ import DialogBox from "@/components/DialogBox";
 
 function Homepage() {
   return (
-    <div className="min-h-screen flex flex-col p-8">
+    <div className="min-h-[90vh] flex flex-col p-8">
       <div className="flex justify-between border-b-2 pb-4">
         <div className="font-bold text-xl">My Stacks</div>
         <DialogBox />

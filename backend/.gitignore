@@ -1,1 +1,20 @@
 .env
+alembic/versions
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local databases
+chroma_data/
+*.db
+*.sqlite3
+
+# IDE and editor specific files
+.vscode/
+.idea/
