@@ -1,6 +1,5 @@
-# api/v1/api.py
 from fastapi import APIRouter
-from api.v1.endpoints import chat
-
+from api.v1.endpoints import chat,knowledge
 api_router = APIRouter()
 api_router.include_router(chat.router, prefix="/v1", tags=["v1"])
+api_router.include_router(knowledge.router, prefix="/v1/knowledge", tags=["v1_knowledge"])

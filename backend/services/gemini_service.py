@@ -16,9 +16,6 @@ model = genai.GenerativeModel(
 )
 
 def get_gemini_response(prompt: str) -> str:
-    """
-    Takes a prompt and returns the response from Gemini.
-    """
     try:
         response = model.generate_content(prompt)
         return response.text
