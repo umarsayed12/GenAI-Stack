@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 import Homepage from "./pages/Homepage";
-
+import EditStackPage from "./pages/EditStackPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,6 +13,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Homepage />,
+      },
+      {
+        path: "/:id",
+        element: <EditStackPage />,
       },
     ],
   },

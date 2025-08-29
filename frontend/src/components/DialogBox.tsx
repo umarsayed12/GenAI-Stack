@@ -11,40 +11,91 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { useStacks } from "@/hooks/useStacks";
+import { useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+type FormData = {
+  name: string;
+  desc: string;
+};
+function DialogBox({ onStackCreated }: { onStackCreated?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+  const { createStack, fetchStacks } = useStacks();
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    setLoading(true);
+    await createStack({ name: data.name, description: data.desc });
+    setLoading(false);
+    setOpen(false);
+    onStackCreated?.();
+  };
+  useEffect(() => {
+    const loadStacks = async () => {
+      await fetchStacks();
+    };
 
-function DialogBox() {
+    loadStacks();
+  }, [fetchStacks]);
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button className="cursor-pointer">+ New Stack</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Create New Stack</DialogTitle>
-          </DialogHeader>
+    <Dialog open={open}>
+      <DialogTrigger asChild>
+        <Button className="cursor-pointer" onClick={() => setOpen(true)}>
+          + New Stack
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Create New Stack</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4">
             <div className="grid gap-3">
               <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" />
+              <Input
+                id="name-1"
+                {...register("name", { required: "Name is required" })}
+              />
+              {errors.name && (
+                <p className="text-red-600">{errors?.name?.message}</p>
+              )}
             </div>
             <div className="grid gap-3">
               <Label htmlFor="desc">Description</Label>
-              <Textarea id="desc" name="desc" className="h-[150px]" />
+              <Textarea
+                id="desc"
+                className="h-[150px]"
+                {...register("desc", { required: "Description is required" })}
+              />
+              {errors.desc && (
+                <p className="text-red-600">{errors?.desc?.message}</p>
+              )}
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button variant="outline" className="cursor-pointer">
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" className="cursor-pointer">
-              Create
-            </Button>
+            {!loading ? (
+              <Button type="submit" className="cursor-pointer">
+                Create
+              </Button>
+            ) : (
+              <Button type="submit" disabled className="cursor-pointer">
+                Create <Loader2 className="w-2 h-2 animate-spin" />
+              </Button>
+            )}
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
