@@ -33,12 +33,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useStack } from "@/hooks/useStack";
 import { LoaderOne } from "@/components/ui/loader";
 import { ChatModal } from "@/components/ChatModal";
-import {
-  CloudIcon,
-  MessageCircle,
-  PlayCircleIcon,
-  PlayIcon,
-} from "lucide-react";
+import { MessageCircle, PlayIcon } from "lucide-react";
 import { toast } from "sonner";
 let id = 0;
 const getId = () => `dndnode_${id++}`;
