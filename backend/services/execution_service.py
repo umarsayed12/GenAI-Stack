@@ -30,10 +30,6 @@ def execute_workflow(stack_id: int, user_query: str, db: Session):
             indegree[nei] -= 1
             if indegree[nei] == 0:
                 queue.append(nei)
-
-    # -------------------
-    # Node execution
-    # -------------------
     node_outputs = {}
     final_result = "Execution did not produce a final output."
 

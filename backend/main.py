@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from api.v1.api import api_router
 from fastapi.middleware.cors import CORSMiddleware
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 app = FastAPI(title="GenAI Stack API")
 origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
+    os.getenv("FRONTEND_URL")
 ]
 
 app.add_middleware(
