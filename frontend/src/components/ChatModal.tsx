@@ -28,6 +28,8 @@ export const ChatModal = ({ stackId, isOpen, onClose }: ChatModalProps) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
@@ -38,7 +40,7 @@ export const ChatModal = ({ stackId, isOpen, onClose }: ChatModalProps) => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/stacks/${stackId}/execute`,
+        `${backendUrl}/api/v1/stacks/${stackId}/execute`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

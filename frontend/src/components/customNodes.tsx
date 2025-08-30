@@ -69,6 +69,8 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -86,7 +88,7 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
     }
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/knowledge/upload-pdf",
+        `${backendUrl}/api/v1/knowledge/upload-pdf`,
         {
           method: "POST",
           body: formData,

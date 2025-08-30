@@ -1,11 +1,10 @@
 import { useState, useCallback } from "react";
 
-// The full stack type including workflow data for optimistic updates
 export type Stack = {
   id: number;
   name: string;
   description: string | null;
-  workflow_data?: any; // Optional, as it's not always needed
+  workflow_data?: any;
 };
 
 export type CreateStackData = {
@@ -13,8 +12,9 @@ export type CreateStackData = {
   description: string | null;
 };
 
-// Reverting to a hardcoded URL to resolve the import.meta warning for now.
-const API_URL = "http://127.0.0.1:8000/api/v1/stacks/";
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+
+const API_URL = `${backendUrl}/api/v1/stacks/`;
 
 export const useStacks = () => {
   const [stacks, setStacks] = useState<Stack[]>([]);
@@ -46,7 +46,6 @@ export const useStacks = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...stackData,
-          // Start with a clean, empty workflow
           workflow_data: {
             nodes: [],
             edges: [],
@@ -60,13 +59,11 @@ export const useStacks = () => {
       }
 
       const newStack: Stack = await response.json();
-
-      // Optimistic Update: Add the new stack to the local state directly
       setStacks((prevStacks) => [newStack, ...prevStacks]);
     } catch (err: any) {
       setError(err.message);
       console.error(err);
-      throw err; // Re-throw the error so the component can handle it
+      throw err;
     }
   };
 
@@ -78,14 +75,12 @@ export const useStacks = () => {
       if (!response.ok) {
         throw new Error("Failed to delete stack");
       }
-
-      // Optimistic Update: Remove the stack from the local state directly
       setStacks((prevStacks) =>
         prevStacks.filter((stack) => stack.id !== stackId)
       );
     } catch (err: any) {
       console.error("Error deleting stack:", err.message);
-      throw err; // Re-throw the error so the component can handle it
+      throw err;
     }
   };
 

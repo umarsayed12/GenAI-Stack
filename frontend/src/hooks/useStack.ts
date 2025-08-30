@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import type { Stack } from "./useStacks"; // We can reuse the Stack type
+import type { Stack } from "./useStacks";
 
-const API_URL = "http://127.0.0.1:8000/api/v1/stacks/";
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+
+const API_URL = `${backendUrl}/api/v1/stacks/`;
 
 export const useStack = (stackId: string) => {
   const [stack, setStack] = useState<Stack | null>(null);
@@ -42,7 +44,6 @@ export const useStack = (stackId: string) => {
       if (!response.ok) {
         throw new Error("Failed to update stack");
       }
-      // Optionally, you can refetch or just assume success
       console.log("Stack updated successfully!");
     } catch (err: any) {
       setError(err.message);
