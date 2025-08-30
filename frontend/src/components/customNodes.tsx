@@ -15,7 +15,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Upload } from "lucide-react";
 import { memo, useState, useRef } from "react";
-
+import { embedding_models, gemini_models } from "@/lib/constants";
 const CustomHandle = (props: {
   type: "source" | "target";
   position: Position;
@@ -35,11 +35,14 @@ type NodeData = {
 };
 
 export const UserQueryNode = memo(({ data }: NodeProps<NodeData>) => {
-  const { label, userQuery = "", onDataChange } = data;
+  const { label = "User Input", userQuery = "", onDataChange } = data;
   return (
     <Card className="w-80 shadow-lg border-gray-300">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
+        <CardTitle className="text-md font-bold">{label}</CardTitle>
+        <CardTitle className="text-sm font-medium bg-accent p-2">
+          Enter point for queries
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <Label htmlFor="user-query">User Query</Label>
@@ -58,7 +61,7 @@ export const UserQueryNode = memo(({ data }: NodeProps<NodeData>) => {
 
 export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
   const {
-    label,
+    label = "Knowledge Base",
     apiKey = "",
     embeddingModel = "text-embedding-3-large",
     onDataChange,
@@ -78,7 +81,9 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
 
     const formData = new FormData();
     formData.append("file", file);
-
+    if (data.apiKey) {
+      formData.append("api_key", data.apiKey);
+    }
     try {
       const response = await fetch(
         "http://127.0.0.1:8000/api/v1/knowledge/upload-pdf",
@@ -93,10 +98,14 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
       }
       const result = await response.json();
       setUploadStatus("Upload successful!");
-      onDataChange({ collectionName: result.collection_name });
+      onDataChange({
+        collectionName: result.collection_name,
+        uploadSuccess: true,
+      });
     } catch (error) {
       console.error(error);
       setUploadStatus("Upload failed. Please try again.");
+      onDataChange({ uploadSuccess: false });
     }
   };
 
@@ -105,11 +114,14 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
   };
 
   return (
-    <Card className="w-80 shadow-lg border-gray-300">
+    <Card className="w-80 h-96 space-y-2 shadow-lg border-gray-300">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
+        <CardTitle className="text-md font-bold">{label}</CardTitle>
+        <CardTitle className="text-sm font-medium bg-accent p-2">
+          Let LLM search info in your file
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-8">
         <div>
           <Label>File for Knowledge Base</Label>
           <input
@@ -133,26 +145,29 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
             <p className="text-xs text-green-600 mt-1">{uploadStatus}</p>
           )}
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>Embedding Model</Label>
           <Select
             value={embeddingModel}
             onValueChange={(value) => onDataChange({ embeddingModel: value })}
           >
-            <SelectTrigger className="nodrag">
+            <SelectTrigger className="nodrag w-full">
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="text-embedding-3-large">
-                text-embedding-3-large
-              </SelectItem>
-              <SelectItem value="text-embedding-3-small">
-                text-embedding-3-small
-              </SelectItem>
+              {embedding_models.map((model) => (
+                <SelectItem
+                  key={model.model_name}
+                  title={model.use_case}
+                  value={model.model_name}
+                >
+                  {model.model_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>API Key</Label>
           <Input
             type="password"
@@ -170,7 +185,7 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
 
 export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
   const {
-    label,
+    label = "LLM Model",
     model = "gemini-1.5-flash",
     apiKey = "",
     prompt = "You are a helpful PDF assistant.\n\n[CONTEXT]: {context}\n\nUser Query: {query}",
@@ -182,25 +197,35 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
   return (
     <Card className="w-96 shadow-lg border-gray-300">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
+        <CardTitle className="text-md font-bold">{label}</CardTitle>
+        <CardTitle className="text-sm font-medium bg-accent p-2">
+          Run a query with Gemini LLM
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
+        <div className="space-y-2">
           <Label>Model</Label>
           <Select
             value={model}
             onValueChange={(value) => onDataChange({ model: value })}
           >
-            <SelectTrigger className="nodrag">
+            <SelectTrigger className="nodrag w-full">
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="gemini-1.5-flash">Gemini 1.5 Flash</SelectItem>
-              <SelectItem value="gpt-4o-mini">GPT 4o-Mini</SelectItem>
+              {gemini_models.map((model) => (
+                <SelectItem
+                  key={model.model_name}
+                  value={model.model_name}
+                  title={model.use_case}
+                >
+                  {model.model_name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>API Key</Label>
           <Input
             type="password"
@@ -209,7 +234,7 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
             className="nodrag"
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>Prompt</Label>
           <Textarea
             className="h-32 nodrag"
@@ -217,7 +242,7 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
             onChange={(e) => onDataChange({ prompt: e.target.value })}
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <Label>Temperature</Label>
           <Input
             type="number"
@@ -272,14 +297,17 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
 
 export const OutputNode = memo(({ data }: NodeProps<NodeData>) => {
   const {
-    label,
+    label = "Output",
     outputText = "Output will be generated based on query",
     onDataChange,
   } = data;
   return (
     <Card className="w-80 shadow-lg border-gray-300">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
+        <CardTitle className="text-lg text-start font-bold">{label}</CardTitle>
+        <CardTitle className="text-sm text-start font-medium bg-accent p-2">
+          Output of result node as text
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Textarea

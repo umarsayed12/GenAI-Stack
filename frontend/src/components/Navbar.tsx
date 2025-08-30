@@ -12,7 +12,7 @@ import {
 const Navbar = () => {
   return (
     <nav className="w-full flex items-center justify-between px-6 py-3 bg-white shadow-md">
-      <h1 className="text-xl font-semibold">Tarkflow.ai</h1>
+      <h1 className="text-xl font-semibold">GenAI Stack</h1>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer">

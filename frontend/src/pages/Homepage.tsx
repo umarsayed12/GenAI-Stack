@@ -12,6 +12,7 @@ import { ExternalLink, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoaderOne } from "@/components/ui/loader";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function Homepage() {
   const { fetchStacks, stacks, isLoading, deleteStack } = useStacks();
@@ -19,15 +20,18 @@ function Homepage() {
   const navigate = useNavigate();
   const handleDelete = async (id: number) => {
     setDeleteLoaderId(id);
-    await deleteStack(id);
-    setDeleteLoaderId(NaN);
-    await fetchStacks();
+    try {
+      await deleteStack(id);
+      setDeleteLoaderId(NaN);
+      toast.success("Stack Deleted Successfully");
+      await fetchStacks();
+    } catch {
+      toast.error("Error Deleting Stack. Try Again.");
+    }
   };
   useEffect(() => {
     const loadStacks = async () => {
-      console.log("Calling fetchStacks...");
       await fetchStacks();
-      console.log("fetchStacks has finished.");
     };
 
     loadStacks();

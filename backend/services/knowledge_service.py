@@ -1,20 +1,26 @@
 import chromadb
 from pypdf import PdfReader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter 
 import google.generativeai as genai
-import os
-import uuid
-
+from core.config import GEMINI_API_KEY
 
 client = chromadb.PersistentClient(path="./chroma_data")
 embedding_model = "models/text-embedding-004"
 
-def process_pdf_and_store(file_path: str, collection_name: str):
+def configure_gemini(api_key: str | None = None):
+    final_api_key = api_key if api_key else GEMINI_API_KEY
+    if not final_api_key:
+        raise ValueError("Gemini API key is not configured.")
+    genai.configure(api_key=final_api_key)
+
+def process_pdf_and_store(file_path: str, collection_name: str, api_key: str | None = None):
     try:
+        configure_gemini(api_key)
+
         reader = PdfReader(file_path)
         text = ""
         for page in reader.pages:
-            text += page.extract_text()
+            text += page.extract_text() or ""
 
         if not text:
             return {"error": "Could not extract text from PDF."}
@@ -43,8 +49,13 @@ def process_pdf_and_store(file_path: str, collection_name: str):
         print(f"Error in processing PDF: {e}")
         return {"error": str(e)}
 
-def query_collection(collection_name: str, query: str, n_results: int = 3):
+def query_collection(collection_name: str, query: str, api_key: str | None = None, n_results: int = 3):
+    """
+    User ki API key ka istemal karke collection se query karta hai.
+    """
     try:
+        configure_gemini(api_key)
+        
         collection = client.get_collection(name=collection_name)
         query_embedding_response = genai.embed_content(model=embedding_model, content=query)
         query_embedding = query_embedding_response['embedding']

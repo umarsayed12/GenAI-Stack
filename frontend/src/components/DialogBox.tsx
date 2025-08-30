@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 type FormData = {
   name: string;
   desc: string;
@@ -31,9 +32,14 @@ function DialogBox({ onStackCreated }: { onStackCreated?: () => void }) {
   const { createStack, fetchStacks } = useStacks();
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setLoading(true);
-    await createStack({ name: data.name, description: data.desc });
+    try {
+      await createStack({ name: data.name, description: data.desc });
+      toast.success("Stack created successfully");
+      setOpen(false);
+    } catch (error) {
+      toast.error("Error creating stack. Try Again.");
+    }
     setLoading(false);
-    setOpen(false);
     onStackCreated?.();
   };
   useEffect(() => {
@@ -80,7 +86,11 @@ function DialogBox({ onStackCreated }: { onStackCreated?: () => void }) {
           </div>
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button variant="outline" className="cursor-pointer">
+              <Button
+                onClick={() => setOpen(false)}
+                variant="outline"
+                className="cursor-pointer"
+              >
                 Cancel
               </Button>
             </DialogClose>

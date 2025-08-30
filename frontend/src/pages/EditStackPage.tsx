@@ -32,7 +32,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useStack } from "@/hooks/useStack";
 import { LoaderOne } from "@/components/ui/loader";
-
+import { ChatModal } from "@/components/ChatModal";
+import {
+  CloudIcon,
+  MessageCircle,
+  PlayCircleIcon,
+  PlayIcon,
+} from "lucide-react";
+import { toast } from "sonner";
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
@@ -49,7 +56,7 @@ const StackEditor = () => {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const nodeTypes = useMemo(
     () => ({
       userQuery: UserQueryNode,
@@ -71,6 +78,47 @@ const StackEditor = () => {
       setEdges(flow.edges || []);
     }
   }, [stack]);
+
+  useEffect(() => {
+    const llmNodes = nodes.filter((n) => n.type === "llm");
+
+    llmNodes.forEach((llm) => {
+      const incomingEdges = edges.filter((e) => e.target === llm.id);
+
+      const fromQuery = incomingEdges.some((e) => {
+        const src = nodes.find((n) => n.id === e.source);
+        return src?.type === "userQuery";
+      });
+
+      const fromKB = incomingEdges.some((e) => {
+        const src = nodes.find((n) => n.id === e.source);
+        return src?.type === "knowledgeBase";
+      });
+      const kbNode = nodes.find(
+        (n) =>
+          n.type === "knowledgeBase" &&
+          edges.some((e) => e.source === n.id && e.target === llm.id)
+      );
+
+      const kbSuccess = kbNode?.data?.uploadSuccess;
+      const basePrompt =
+        llm.data.initialPrompt || "You are a helpful assistant.";
+
+      let newPrompt = basePrompt;
+
+      if (fromQuery && fromKB) {
+        if (kbSuccess) {
+          newPrompt += `\n\nContext: {context}`;
+        }
+        newPrompt += `\n\nUser Query: {query}`;
+      } else if (fromQuery) {
+        newPrompt += `\n\nUser Query: {query}`;
+      }
+      if (llm.data.prompt !== newPrompt) {
+        onNodeDataChange(llm.id, { prompt: newPrompt });
+      }
+    });
+  }, [nodes, edges]);
 
   const onNodeDataChange = (nodeId: string, newData: any) => {
     setNodes((nds) =>
@@ -145,9 +193,10 @@ const StackEditor = () => {
         case "llm":
           initialData = {
             id: newId,
-            model: "gpt-4o-mini",
+            model: "gemini-1.5-flash",
             apiKey: "",
-            prompt: "You are a helpful assistant...",
+            initialPrompt: "You are a helpful assistant.",
+            prompt: "You are a helpful assistant.",
             temperature: 0.7,
             webSearch: false,
             serpApi: "",
@@ -173,9 +222,14 @@ const StackEditor = () => {
   );
 
   const handleSave = () => {
-    if (reactFlowInstance) {
-      const workflow_data: ReactFlowJsonObject = reactFlowInstance.toObject();
-      updateStack(workflow_data);
+    try {
+      if (reactFlowInstance) {
+        const workflow_data: ReactFlowJsonObject = reactFlowInstance.toObject();
+        updateStack(workflow_data);
+        toast.success("Stack saved successfully");
+      }
+    } catch (error) {
+      toast.error("Unable to save toast. Try Again.");
     }
   };
 
@@ -199,12 +253,32 @@ const StackEditor = () => {
     <div className="flex h-screen w-full flex-col">
       <header className="flex h-16 items-center justify-between border-b bg-white px-6 shrink-0">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-            Back
+          <Button
+            className="cursor-pointer"
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/")}
+          >
+            Home
           </Button>
           <h1 className="text-lg font-semibold">{stack?.name}</h1>
         </div>
-        <Button onClick={handleSave}>Save</Button>
+        <div className="flex items-center gap-2">
+          <Button
+            title="Chat with AI"
+            onClick={() => setIsChatModalOpen(true)}
+            className="cursor-pointer"
+          >
+            <MessageCircle />
+          </Button>
+          <Button
+            title="Build Stack"
+            onClick={handleSave}
+            className="cursor-pointer"
+          >
+            <PlayIcon />
+          </Button>
+        </div>
       </header>
       <div className="flex flex-grow">
         <aside className="w-64 border-r bg-gray-50 p-4">
@@ -296,6 +370,13 @@ const StackEditor = () => {
           </aside>
         )}
       </div>
+      {stackId && (
+        <ChatModal
+          stackId={stackId}
+          isOpen={isChatModalOpen}
+          onClose={() => setIsChatModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
