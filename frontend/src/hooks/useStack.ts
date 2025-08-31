@@ -44,7 +44,6 @@ export const useStack = (stackId: string) => {
       if (!response.ok) {
         throw new Error("Failed to update stack");
       }
-      console.log("Stack updated successfully!");
     } catch (err: any) {
       setError(err.message);
       console.error(err);
