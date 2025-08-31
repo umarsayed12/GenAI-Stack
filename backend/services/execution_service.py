@@ -63,16 +63,20 @@ def execute_workflow(stack_id: int, user_query: str, db: Session):
                 node_outputs[current_node_id] = {'context': context}
 
         elif node_type == 'llm':
-            print(node_outputs)
+            print("Node Outputs : ",node_outputs)
+            print()
             llm_input_query = ""
             llm_input_context = ""
             for edge in edges:
                 if edge['target'] == current_node_id:
                     source_output = node_outputs.get(edge['source'], {})
+                    print("Source OUTPUT : ", source_output)
                     if edge['targetHandle'] == 'context':
                         llm_input_query = source_output.get('query', "")
                     elif edge['targetHandle'] == 'query':
                         llm_input_context = source_output.get('context', "")
+            print("QUERYYYY : ", llm_input_query)
+            print("CONTEXTTT : ", llm_input_context)
             prompt_template = node_data.get('prompt', "User Query: {query}")
             final_prompt = (
                 prompt_template.replace("{context}", llm_input_context)
