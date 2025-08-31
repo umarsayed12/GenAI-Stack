@@ -66,7 +66,7 @@ ChromaDB / Neon
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-username/genai-stack.git
+git clone https://github.com/umarsayed12/GenAI-Stack.git
 cd genai-stack/backend
 
 # 2. Virtual env
@@ -281,5 +281,5 @@ A: Add SPA fallback (`/*  /index.html  200`) via `_redirects` or `netlify.toml`.
 ## 👤 Author
 
 **Umar Sayed**
-GitHub: [your-username](https://github.com/your-username)
-LinkedIn: [your-linkedin-profile](https://www.linkedin.com/in/your-linkedin-profile/)
+GitHub: [umarsayed12](https://github.com/umarsayed12)
+LinkedIn: [umar-khursheed](https://www.linkedin.com/in/umar-khursheed)
