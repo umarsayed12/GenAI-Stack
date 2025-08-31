@@ -77,6 +77,9 @@ def execute_workflow(stack_id: int, user_query: str, db: Session):
                 prompt_template.replace("{context}", llm_input_context)
                                .replace("{query}", llm_input_query)
             )
+            print("WorkFlow : ", workflow)
+            print()
+            print("Final Prompt : ", final_prompt)
             user_api_key = node_data.get('apiKey')
 
             response_text = get_gemini_response(
