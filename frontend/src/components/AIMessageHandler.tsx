@@ -31,7 +31,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ rawMarkdown }) => {
           ol: ({ node, ...props }) => (
             <ol className="list-decimal pl-5 space-y-1" {...props} />
           ),
-          code({ node, inline, className, children, ...props }) {
+          code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || "");
             return !inline ? (
               <SyntaxHighlighter
@@ -39,7 +39,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ rawMarkdown }) => {
                 language={match ? match[1] : "plaintext"}
                 PreTag="div"
                 className="rounded-lg p-3 my-2"
-                {...props}
+                {...(props as any)}
               >
                 {String(children).replace(/\n$/, "")}
               </SyntaxHighlighter>
