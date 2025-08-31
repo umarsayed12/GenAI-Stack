@@ -6,6 +6,7 @@ import os
 load_dotenv()
 app = FastAPI(title="GenAI Stack API")
 origins = [
+    "https://genaistack.netlify.app",
     os.getenv("FRONTEND_URL")
 ]
 
