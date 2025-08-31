@@ -63,6 +63,7 @@ def execute_workflow(stack_id: int, user_query: str, db: Session):
                 node_outputs[current_node_id] = {'context': context}
 
         elif node_type == 'llm':
+            print(node_outputs)
             llm_input_query = ""
             llm_input_context = ""
             for edge in edges:
