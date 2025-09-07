@@ -50,9 +50,6 @@ def get_db():
 
 @router.post("/", response_model=StackResponse, status_code=status.HTTP_201_CREATED)
 def create_stack(stack: StackCreate, db: Session = Depends(get_db)):
-    """
-    Create a new stack.
-    """
     db_stack = Stack(
         name=stack.name,
         description=stack.description,
@@ -65,9 +62,6 @@ def create_stack(stack: StackCreate, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[StackResponseSimple])
 def read_stacks(db: Session = Depends(get_db)):
-    """
-    Retrieve all stacks.
-    """
     stacks = db.query(Stack).order_by(Stack.id.desc()).all()
     return stacks
 

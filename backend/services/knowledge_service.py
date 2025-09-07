@@ -50,9 +50,6 @@ def process_pdf_and_store(file_path: str, collection_name: str, api_key: str | N
         return {"error": str(e)}
 
 def query_collection(collection_name: str, query: str, api_key: str | None = None, n_results: int = 3):
-    """
-    User ki API key ka istemal karke collection se query karta hai.
-    """
     try:
         configure_gemini(api_key)
         
