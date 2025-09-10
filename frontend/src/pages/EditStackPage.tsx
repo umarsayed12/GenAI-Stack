@@ -175,7 +175,7 @@ const StackEditor = () => {
       const newId = getId();
       switch (type) {
         case "userQuery":
-          initialData = { id: newId, query: "Write your query here" };
+          initialData = { id: newId, userQuery: "Write your query here" };
           break;
         case "knowledgeBase":
           initialData = {
@@ -193,8 +193,8 @@ const StackEditor = () => {
             initialPrompt: "You are a helpful assistant.",
             prompt: "You are a helpful assistant.",
             temperature: 0.7,
-            webSearch: false,
-            serpApi: "",
+            useWebSearch: false,
+            serfApiKey: "",
           };
           break;
         case "output":

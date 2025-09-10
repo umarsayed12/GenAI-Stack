@@ -116,7 +116,7 @@ export const KnowledgeBaseNode = memo(({ data }: NodeProps<NodeData>) => {
   };
 
   return (
-    <Card className="w-80 h-96 space-y-2 shadow-lg border-gray-300">
+    <Card className="w-80 h-[420px] space-y-2 shadow-lg border-gray-300">
       <CardHeader>
         <CardTitle className="text-md font-bold">{label}</CardTitle>
         <CardTitle className="text-sm font-medium bg-accent p-2">

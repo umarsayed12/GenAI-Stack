@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from models.stack import Stack
 from services.knowledge_service import query_collection
 from services.gemini_service import get_gemini_response
+from services.web_search_service import perform_web_search
 import json
 from collections import defaultdict, deque
 
@@ -73,17 +74,31 @@ def execute_workflow(stack_id: int, user_query: str, db: Session):
                     elif edge['targetHandle'] == 'query':
                         llm_input_context = source_output.get('context', "")
             prompt_template = node_data.get('prompt', "User Query: {query}")
-            final_prompt = (
+            if(llm_input_context == ""):
+                webSearch = node_data.get('useWebSearch')
+                serfApiKey = node_data.get('serfApiKey')
+                if(webSearch):
+                    if(serfApiKey):
+                        web_context = perform_web_search(llm_input_query, serfApiKey)
+                        if(web_context==""):
+                            node_outputs[current_node_id] = {'output': "No relevant response found.\nCheck Serp API key or enter a valid query for web search."}
+                        else:
+                            llm_input_context = web_context
+                    else:
+                        node_outputs[current_node_id] = {'output': "Please enter Serp API key for web search."}
+                else:
+                    node_outputs[current_node_id] = {'output': "No Context Provided. Either upload a document or enable web search tool in LLM component."}
+            if(llm_input_context):
+                final_prompt = (
                 prompt_template.replace("{context}", llm_input_context)
                                .replace("{query}", llm_input_query)
-            )
-            user_api_key = node_data.get('apiKey')
-
-            response_text = get_gemini_response(
-                final_prompt,
-                api_key=user_api_key if user_api_key else None
-            )
-            node_outputs[current_node_id] = {'output': response_text}
+                )
+                user_api_key = node_data.get('apiKey')
+                response_text = get_gemini_response(
+                    final_prompt,
+                    api_key=user_api_key if user_api_key else None
+                )
+                node_outputs[current_node_id] = {'output': response_text}
 
         elif node_type == 'output':
             for edge in edges:

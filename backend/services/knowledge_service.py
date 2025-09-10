@@ -49,12 +49,12 @@ def process_pdf_and_store(file_path: str, collection_name: str, api_key: str | N
         print(f"Error in processing PDF: {e}")
         return {"error": str(e)}
 
-def query_collection(collection_name: str, query: str | None = None, api_key: str | None = None, n_results: int = 3):
+def query_collection(collection_name: str, query: str | None = None , api_key: str | None = None, n_results: int = 3):
     try:
         configure_gemini(api_key)
         
         collection = client.get_collection(name=collection_name)
-        query_embedding_response = genai.embed_content(model=embedding_model, content=query)
+        query_embedding_response = genai.embed_content(model=embedding_model, content=query if query else "Query")
         query_embedding = query_embedding_response['embedding']
         results = collection.query(
             query_embeddings=[query_embedding],

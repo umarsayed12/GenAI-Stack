@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,7 +27,14 @@ export const ChatModal = ({ stackId, isOpen, onClose }: ChatModalProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [waitingIndex, setWaitingIndex] = useState(0);
+  const waitingTexts = [
+    "Generating Response...",
+    "Thinking through your query...",
+    "Still Thinking...",
+    "Getting best answer for you...",
+    "Almost done, preparing answer...",
+  ];
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
   const handleSendMessage = async () => {
@@ -66,7 +73,18 @@ export const ChatModal = ({ stackId, isOpen, onClose }: ChatModalProps) => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    if (!isLoading) {
+      setWaitingIndex(0);
+      return;
+    }
 
+    const interval = setInterval(() => {
+      setWaitingIndex((prev) => (prev + 1) % waitingTexts.length);
+    }, 5500);
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[1200px] h-[90vh] flex flex-col">
@@ -110,7 +128,7 @@ export const ChatModal = ({ stackId, isOpen, onClose }: ChatModalProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="rounded-lg p-3 max-w-sm">
-                    <p className="text-sm">Generating Response...</p>
+                    <p className="text-sm">{waitingTexts[waitingIndex]}</p>
                   </div>
                 </div>
               )}
