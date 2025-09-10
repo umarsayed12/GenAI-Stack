@@ -190,7 +190,7 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
     label = "LLM Model",
     model = "gemini-1.5-flash",
     apiKey = "",
-    prompt = "You are a helpful PDF assistant.\n\n[CONTEXT]: {context}\n\nUser Query: {query}",
+    prompt = "You are a helpful PDF assistant. Handle the response with some quote and emoji. \n\n[CONTEXT]: {context}\n\nUser Query: {query}",
     temperature = 0.75,
     useWebSearch = false,
     serfApiKey = "",
@@ -241,7 +241,9 @@ export const LLMNode = memo(({ data }: NodeProps<NodeData>) => {
           <Textarea
             className="h-32 nodrag"
             value={prompt}
-            onChange={(e) => onDataChange({ prompt: e.target.value })}
+            onChange={(e) =>
+              onDataChange({ prompt: e.target.value, isUserEdited: true })
+            }
           />
         </div>
         <div className="space-y-2">

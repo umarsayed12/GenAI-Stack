@@ -109,7 +109,7 @@ const StackEditor = () => {
       } else if (fromQuery) {
         newPrompt += `\n\nUser Query: {query}`;
       }
-      if (llm.data.prompt !== newPrompt) {
+      if (!llm.data.isUserEdited && llm.data.prompt !== newPrompt) {
         onNodeDataChange(llm.id, { prompt: newPrompt });
       }
     });
